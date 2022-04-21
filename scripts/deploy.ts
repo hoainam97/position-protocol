@@ -11,7 +11,13 @@ import {BUSD, BUSD_ADDRESS} from "../constants";
 task('deploy', 'deploy contracts', async (taskArgs: {stage: Stage}, hre, runSuper) => {
     const basePath = path.join(__dirname, "../deploy/migrations")
     const filenames = await readdir(basePath)
-    const db = new DeployDataStore(taskArgs.stage == 'production' && './deployData_mainnet.db')
+    let filename
+    if (taskArgs.stage == 'production'){
+        filename = './deployData_mainnet.db'
+    } else if (hre.network.name == "qc") {
+        filename = './deployData_develop_qc.db'
+    }
+    const db = new DeployDataStore(filename)
     const context: MigrationContext = {
         stage: taskArgs.stage,
         network: hre.network.name as Network,
