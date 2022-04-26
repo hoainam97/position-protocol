@@ -241,7 +241,7 @@ export class ContractWrapperFactory {
 
     async createChainlinkPriceFeedQc( args: CreateChainLinkPriceFeed){
         const ChainLinkPriceFeed = await this.hre.ethers.getContractFactory("ChainLinkPriceFeedMock");
-        const chainlinkContractAddress = await this.db.findAddressByKey(`ChainLinkPriceFeedMock`);
+        const chainlinkContractAddress = await this.db.findAddressByKey(`ChainLinkPriceFeed`);
         if (chainlinkContractAddress) {
             const upgraded = await this.hre.upgrades.upgradeProxy(chainlinkContractAddress, ChainLinkPriceFeed);
             await this.verifyImplContract(upgraded.deployTransaction);
@@ -252,7 +252,7 @@ export class ContractWrapperFactory {
             await instance.deployed();
             const address = instance.address.toString().toLowerCase();
             console.log(`Chain link price feed address : ${address}`)
-            await this.db.saveAddressByKey('ChainLinkPriceFeedMock', address);
+            await this.db.saveAddressByKey('ChainLinkPriceFeed', address);
 
         }
     }

@@ -9,6 +9,8 @@ const migrations: MigrationDefinition = {
              * Currently no param
              */
             if (context.network == "qc") {
+                await context.factory.createChainlinkPriceFeedQc({})
+            } else {
                 await context.factory.createChainlinkPriceFeed({})
             }
 
