@@ -1,0 +1,109 @@
+{
+  "targetTrader": 1,
+  "steps": [
+    {
+      "action": "dumpPrice",
+      "price": 3900
+    },
+    {
+      "action": "openLimit",
+      "price": 3900,
+      "side": 0,
+      "quantity": 4,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 3800,
+      "side": 0,
+      "quantity": 11,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 3500,
+      "side": 0,
+      "quantity": 5,
+      "trader": 2
+    },
+    {
+      "action": "openMarket",
+      "quantity": 20,
+      "side": 1,
+      "trader": 1
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3500
+    },
+    {
+      "action": "addMargin",
+      "trader": 1,
+      "amount": 1000
+    },
+    {
+      "action": "openLimit",
+      "price": 3600,
+      "side": 1,
+      "quantity": 4,
+      "trader": 3
+    },
+    {
+      "action": "openMarket",
+      "quantity": 4,
+      "side": 0,
+      "trader": 1
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3600
+    },
+    {
+      "action": "removeMargin",
+      "trader": 1,
+      "amount": 500
+    },
+    {
+      "action": "openLimit",
+      "price": 3700,
+      "side": 1,
+      "quantity": 3,
+      "trader": 1
+    },
+    {
+      "action": "openMarket",
+      "quantity": 3,
+      "side": 0,
+      "trader": 2
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3700
+    },
+    {
+      "action": "openLimit",
+      "price": 3300,
+      "side": 0,
+      "quantity": 19,
+      "trader": 1
+    },
+    {
+      "action": "openMarket",
+      "quantity": 19,
+      "side": 1,
+      "trader": 3
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3300
+    },
+    {
+      "action": "claimFund",
+      "trader": 1
+    },
+    {
+      "action": "assertTotalReceived",
+      "value": 3492
+    }
+  ]
+}

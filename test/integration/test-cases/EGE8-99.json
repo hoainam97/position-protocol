@@ -1,0 +1,134 @@
+{
+  "targetTrader": 1,
+  "steps": [
+    {
+      "action": "dumpPrice",
+      "price": 4000
+    },
+    {
+      "action": "openLimit",
+      "price": 3900,
+      "side": 0,
+      "quantity": 5,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 3800,
+      "side": 0,
+      "quantity": 5,
+      "trader": 2
+    },
+    {
+      "action": "openMarket",
+      "quantity": 10,
+      "side": 1,
+      "trader": 1
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3800
+    },
+    {
+      "action": "openLimit",
+      "price": 3700,
+      "side": 0,
+      "quantity": 5,
+      "trader": 1
+    },
+    {
+      "action": "openMarket",
+      "quantity": 5,
+      "side": 1,
+      "trader": 2
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3700
+    },
+    {
+      "action": "addMargin",
+      "trader": 1,
+      "amount": 2000
+    },
+    {
+      "action": "openLimit",
+      "price": 3600,
+      "side": 0,
+      "quantity": 10,
+      "trader": 2
+    },
+    {
+      "action": "openMarket",
+      "quantity": 10,
+      "side": 1,
+      "trader": 1
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3600
+    },
+    {
+      "action": "pumpPrice",
+      "price": 4000
+    },
+    {
+      "action": "openLimit",
+      "price": 3500,
+      "side": 0,
+      "quantity": 10,
+      "trader": 1
+    },
+    {
+      "action": "openMarket",
+      "quantity": 10,
+      "side": 1,
+      "trader": 2
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3500
+    },
+    {
+      "action": "removeMargin",
+      "trader": 1,
+      "amount": 1000
+    },
+    {
+      "action": "openLimit",
+      "price": 3500,
+      "side": 0,
+      "quantity": 5,
+      "trader": 1
+    },
+    {
+      "action": "openLimit",
+      "price": 3500,
+      "side": 1,
+      "quantity": 3,
+      "trader": 2
+    },
+    {
+      "action": "openMarket",
+      "quantity": 2,
+      "side": 1,
+      "trader": 2
+    },
+    {
+      "action": "setMockPrice",
+      "price": 3500
+    },
+    {
+      "action": "claimFund",
+      "trader": 1
+    },
+    {
+      "action": "assertMargin",
+      "value": 1007
+    },
+    {
+      "action": "assertEntry",
+      "value": 1007
+    }
+  ]
+}
