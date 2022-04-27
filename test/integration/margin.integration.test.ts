@@ -1,7 +1,8 @@
 import {ethers} from "hardhat";
 import {deployPositionHouse} from "../shared/deploy";
 import {
-    BEP20Mintable, FundingRateTest,
+    BEP20Mintable,
+    FundingRateTest,
     InsuranceFund,
     PositionHouse,
     PositionHouseConfigurationProxy,
@@ -1669,8 +1670,626 @@ describe('Test Margin Intergration', function () {
             console.log("exchangedQuoteAmount", exchangedQuoteAmount.toString())
             expect(exchangedQuoteAmount).eq(BigNumber.from("2291450000000000000000"))
         })
-    });
 
+        // EGE-8: Row 85
+        it("should get correct amount of claimable fund when add and remove margin then close position by limit order 16", async () => {
+            await phTT.dumpPrice({
+                toPrice: 3900,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            const balanceOfTrader1BeforeTestcase = await bep20Mintable.balanceOf(trader1.address)
+            console.log(`balanceOfTrader1BeforeTestcase: ${balanceOfTrader1BeforeTestcase.toString()}`)
+
+            // STEP 1 - 2
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3800,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('8'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('8'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3800"), BigNumber.from("3800"))
+
+            // STEP 3
+            await positionHouse.connect(trader1).addMargin(fundingRateTest.address, BigNumber.from("1000"))
+
+            // STEP 4-5
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('12'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('12'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            // STEP 6
+            await positionHouse.connect(trader1).addMargin(fundingRateTest.address, BigNumber.from("500"))
+
+            // STEP 7-8
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3600,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('4'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('4'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3600"), BigNumber.from("3600"))
+
+            // STEP 9-10
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('16'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('16'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            await positionHouse.connect(trader1).claimFund(fundingRateTest.address)
+
+            const balanceOfTrader1AfterTestcase = await bep20Mintable.balanceOf(trader1.address)
+            const exchangedQuoteAmount = BigNumber.from(balanceOfTrader1AfterTestcase).sub(BigNumber.from(balanceOfTrader1BeforeTestcase))
+            expect(exchangedQuoteAmount).eq("1192")
+        })
+
+        // EGE-8: Row 87
+        it("should get correct amount of claimable fund when add and remove margin then close position by market order 8", async () => {
+
+            await phTT.dumpPrice({
+                toPrice: 3900,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            const balanceOfTrader1BeforeTestcase = await bep20Mintable.balanceOf(trader1.address)
+            console.log(`balanceOfTrader1BeforeTestcase: ${balanceOfTrader1BeforeTestcase.toString()}`)
+
+            // STEP 1-2-3-4
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3950,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('10'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('5'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('3'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('2'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3950"), BigNumber.from("3950"))
+
+            // STEP 5
+            await positionHouse.connect(trader1).addMargin(fundingRateTest.address, BigNumber.from("1000"))
+
+            // STEP 6-7
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3800,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('2'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('2'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3950"), BigNumber.from("3950"))
+
+            await phTT.dumpPrice({
+                toPrice: 3600,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            // STEP 8
+            await positionHouse.connect(trader1).removeMargin(fundingRateTest.address, BigNumber.from("500"))
+
+            // STEP 9-10
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('5'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            // STEP 11-12
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3600,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('13'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('13'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+
+            await positionHouse.connect(trader1).claimFund(fundingRateTest.address)
+            const balanceOfTrader1AfterTestcase = await bep20Mintable.balanceOf(trader1.address)
+            const exchangedQuoteAmount = BigNumber.from(balanceOfTrader1AfterTestcase).sub(BigNumber.from(balanceOfTrader1BeforeTestcase))
+            expect(exchangedQuoteAmount).eq("3591")
+        })
+
+        // EGE-8: Row 88
+        it("should get correct amount of claimable fund when add and remove margin then close position by market order 6", async () => {
+
+            await phTT.dumpPrice({
+                toPrice: 3900,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            const balanceOfTrader1BeforeTestcase = await bep20Mintable.balanceOf(trader1.address)
+            console.log(`balanceOfTrader1BeforeTestcase: ${balanceOfTrader1BeforeTestcase.toString()}`)
+
+            // STEP 1
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3900,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('10'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            await phTT.pumpPrice({
+                toPrice: 4200,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            // STEP 2
+            await positionHouse.connect(trader1).addMargin(fundingRateTest.address, BigNumber.from("2000"))
+
+            // STEP 3
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3600,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('7'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('7'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3600"), BigNumber.from("3600"))
+
+            await phTT.dumpPrice({
+                toPrice: 3500,
+                pumper: trader3,
+                pumper2: trader4,
+                positionManager: fundingRateTest
+            })
+
+            // STEP 4
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3600,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('1'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3500,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('1'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('2'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3600"), BigNumber.from("3600"))
+
+            // STEP 5
+            await positionHouse.connect(trader1).removeMargin(fundingRateTest.address, BigNumber.from("500"))
+
+            // STEP 6
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3600,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('5'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3600"), BigNumber.from("3600"))
+
+            // STEP 7
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3500,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('6'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('6'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3500"), BigNumber.from("3500"))
+
+            await positionHouse.connect(trader1).claimFund(fundingRateTest.address)
+            const balanceOfTrader1AfterTestcase = await bep20Mintable.balanceOf(trader1.address)
+            const exchangedQuoteAmount = BigNumber.from(balanceOfTrader1AfterTestcase).sub(BigNumber.from(balanceOfTrader1BeforeTestcase))
+            expect(exchangedQuoteAmount).eq("2590")
+        })
+
+        // EGE-8: Row 99
+        it("should get correct amount of claimable fund when add and remove margin then close position by limit order 5", async () => {
+            await phTT.dumpPrice({
+                toPrice: 4000,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            const balanceOfTrader1BeforeTestcase = await bep20Mintable.balanceOf(trader1.address)
+            console.log(`balanceOfTrader1BeforeTestcase: ${balanceOfTrader1BeforeTestcase.toString()}`)
+
+            // STEP 1
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3900,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3800,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('10'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3800"), BigNumber.from("3800"))
+
+            // STEP 2
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('5'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            // STEP 3
+            await positionHouse.connect(trader1).addMargin(fundingRateTest.address, BigNumber.from("2000"))
+
+            // STEP 4
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3600,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('10'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('10'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3600"), BigNumber.from("3600"))
+
+            await phTT.pumpPrice({
+                toPrice: 4000,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            // STEP 5
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3500,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('10'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('10'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3500"), BigNumber.from("3500"))
+
+            // STEP 6
+            await positionHouse.connect(trader1).removeMargin(fundingRateTest.address, BigNumber.from("1000"))
+
+            // STEP 7
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3500,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('5'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3500,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('3'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('2'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3500"), BigNumber.from("3500"))
+
+            await positionHouse.connect(trader1).claimFund(fundingRateTest.address)
+
+            const balanceOfTrader1AfterTestcase = await bep20Mintable.balanceOf(trader1.address)
+            const exchangedQuoteAmount = BigNumber.from(balanceOfTrader1AfterTestcase).sub(BigNumber.from(balanceOfTrader1BeforeTestcase))
+            expect(exchangedQuoteAmount).eq("3492")
+        })
+
+        // EGE-8: Row 106
+        it("should be fully liquidated when remove all margin", async () => {
+            await phTT.dumpPrice({
+                toPrice: 3700,
+                pumper: tradercp1,
+                pumper2: tradercp2,
+                positionManager: fundingRateTest
+            })
+
+            // STEP 1-2
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('7'),
+                _trader: trader1,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('6'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            // STEP 2
+            await positionHouse.connect(trader1).addMargin(fundingRateTest.address, BigNumber.from("1780"))
+
+            // STEP 4-5
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3700,
+                side: SIDE.SHORT,
+                leverage: 10,
+                quantity: BigNumber.from('6'),
+                _trader: trader2,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('5'),
+                leverage: 10,
+                side: SIDE.LONG,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3700"), BigNumber.from("3700"))
+
+            // STEP 6-7
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3195,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('1'),
+                _trader: trader3,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('1'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader2.address,
+                instanceTrader: trader2,
+                _positionManager: fundingRateTest,
+            })
+            await fundingRateTest.setMockPrice(BigNumber.from("3195"), BigNumber.from("3195"))
+
+            // STEP 8-9
+            await phTT.openLimitPositionAndExpect({
+                limitPrice: 3100,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('3'),
+                _trader: trader3,
+                _positionManager: fundingRateTest
+            })
+            await phTT.openMarketPosition({
+                quantity: BigNumber.from('3'),
+                leverage: 10,
+                side: SIDE.SHORT,
+                trader: trader1.address,
+                instanceTrader: trader1,
+                _positionManager: fundingRateTest,
+            })
+
+            // STEP 10
+            const removableMargin = await positionHouse.getRemovableMargin(fundingRateTest.address, trader1.address)
+            await positionHouse.connect(trader1).removeMargin(fundingRateTest.address, removableMargin)
+
+            const maintenanceDetail = await positionHouseViewer.getMaintenanceDetail(fundingRateTest.address, trader1.address, 0)
+            expect(maintenanceDetail.marginRatio).eq("100")
+
+           // Liquidate
+            await positionHouse.liquidate(fundingRateTest.address, trader1.address)
+
+            const positionAfterLiquidate = await positionHouseViewer.getPosition(fundingRateTest.address, trader1.address)
+            expect(positionAfterLiquidate.quantity).eq("0")
+        })
+
+    });
 
     describe('margin with funding rate', function () {
 
