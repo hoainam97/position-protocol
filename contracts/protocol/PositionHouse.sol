@@ -433,6 +433,9 @@ contract PositionHouse is
             _reduceOrders,
             positionData
         );
+        if (positionData.lastUpdatedCumulativePremiumFraction == 0) {
+            positionData.lastUpdatedCumulativePremiumFraction = _getLimitOrderPremiumFraction(_pmAddress, _trader);
+        }
         Position.LiquidatedData memory _debtPosition = debtPosition[_pmAddress][
             _trader
         ];
@@ -677,20 +680,10 @@ contract PositionHouse is
             _pnlCalcOption,
             _oldPosition
         );
-        (
-            uint256 remainMargin,
-            uint256 badDebt,
-            int256 fundingPayment,
-
-        ) = calcRemainMarginWithFundingPayment(
-                _pmAddress,
-                _oldPosition,
-                _oldPosition.margin
-            );
 
         positionResp.realizedPnl = unrealizedPnl;
-        positionResp.marginToVault = -fundingPayment
-            .add(positionResp.realizedPnl).add(_getClaimAmount(_pmAddress, _trader, _oldPosition))
+        positionResp.marginToVault = -positionResp.realizedPnl
+            .add(_getClaimAmount(_pmAddress, _trader, _oldPosition))
             .kPositive();
         positionResp.unrealizedPnl = 0;
         ClaimableAmountManager._reset(_pmAddress, _trader);
