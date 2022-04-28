@@ -5980,6 +5980,36 @@ describe("PositionHouse_02", () => {
             await expect(claimableAmount.toString()).not.eq(totalDepositedMargin.toString())
         })
 
+        it("should fill order correctly when single slot is full buy is wrong", async () => {
+            await openLimitPositionAndExpect({
+                limitPrice: 5000,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('10'),
+                _trader: trader1,
+                skipCheckBalance: true
+            })
 
+            await openLimitPositionAndExpect({
+                limitPrice: 4900,
+                side: SIDE.LONG,
+                leverage: 10,
+                quantity: BigNumber.from('10'),
+                _trader: trader2,
+                skipCheckBalance: true
+            })
+
+            await cancelLimitOrder(positionManager.address, trader2, '1', '490000')
+
+            await expect(openMarketPosition({
+                    quantity: BigNumber.from('10'),
+                    leverage: 10,
+                    side: SIDE.LONG,
+                    trader: trader2.address,
+                    instanceTrader: trader2,
+                    _positionManager: positionManager,
+                }
+            )).to.be.revertedWith("11")
+        })
     })
 })
