@@ -1,0 +1,86 @@
+{
+  "targetTrader": 1,
+  "steps": [
+    {
+      "action": "dumpPrice",
+      "price": 5000
+    },
+    {
+      "action": "openLimit",
+      "price": 5100,
+      "side": 1,
+      "quantity": 10,
+      "trader": 1
+    },
+    {
+      "action": "openMarket",
+      "quantity": 10,
+      "side": 0,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 4800,
+      "side": 0,
+      "quantity": 5,
+      "trader": 1
+    },
+    {
+      "action": "openLimit",
+      "price": 5100,
+      "side": 1,
+      "quantity": 1,
+      "trader": 3
+    },
+    {
+      "action": "openLimit",
+      "price": 5200,
+      "side": 1,
+      "quantity": 2,
+      "trader": 3
+    },
+    {
+      "action": "openLimit",
+      "price": 5300,
+      "side": 1,
+      "quantity": 2,
+      "trader": 3
+    },
+    {
+      "action": "setBalanceCheckPoint"
+    },
+    {
+      "action": "openLimit",
+      "price": 5500,
+      "side": 0,
+      "quantity": 5,
+      "trader": 1
+    },
+    {
+      "action": "setMockPrice",
+      "price": 5300
+    },
+    {
+      "action": "assertMargin",
+      "value": 2550
+    },
+    {
+      "action": "openMarket",
+      "quantity": 5,
+      "side": 0,
+      "trader": 2
+    },
+    {
+      "action": "setMockPrice",
+      "price": 4800
+    },
+    {
+      "action": "claimFund",
+      "trader": 1
+    },
+    {
+      "action": "assertTotalReceived",
+      "value": 4050
+    }
+  ]
+}

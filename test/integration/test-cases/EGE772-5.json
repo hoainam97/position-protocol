@@ -55,12 +55,26 @@
     },
     {
       "action": "assertMargin",
-      "value": 1007
+      "value": 10070
     },
     {
       "action": "assertEntry",
       "value": 5035
+    },
+    {
+      "action": "openLimit",
+      "price": 470,
+      "side": 1,
+      "quantity": 10,
+      "trader": 2
+    },
+    {
+      "action": "assertMargin",
+      "value": 14870
+    },
+    {
+      "action": "assertEntry",
+      "value": 4956
     }
   ]
 }
-

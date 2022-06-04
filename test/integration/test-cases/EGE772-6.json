@@ -1,0 +1,86 @@
+{
+  "targetTrader": 1,
+  "steps": [
+    {
+      "action": "dumpPrice",
+      "price": 5000
+    },
+    {
+      "action": "openLimit",
+      "price": 4900,
+      "side": 0,
+      "quantity": 10,
+      "trader": 1
+    },
+    {
+      "action": "openMarket",
+      "quantity": 10,
+      "side": 1,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 4800,
+      "side": 0,
+      "quantity": 10,
+      "trader": 1
+    },
+    {
+      "action": "openLimit",
+      "price": 5100,
+      "side": 1,
+      "quantity": 5,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 5200,
+      "side": 1,
+      "quantity": 3,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 5300,
+      "side": 1,
+      "quantity": 2,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 5500,
+      "side": 0,
+      "quantity": 10,
+      "trader": 1
+    },
+    {
+      "action": "assertMargin",
+      "value": 10070
+    },
+    {
+      "action": "assertEntry",
+      "value": 5035
+    },
+    {
+      "action": "openMarket",
+      "quantity": 5,
+      "side": 1,
+      "trader": 2
+    },
+    {
+      "action": "openLimit",
+      "price": 460,
+      "side": 1,
+      "quantity": 5,
+      "trader": 2
+    },
+    {
+      "action": "assertMargin",
+      "value": 14870
+    },
+    {
+      "action": "assertEntry",
+      "value": 4956
+    }
+  ]
+}

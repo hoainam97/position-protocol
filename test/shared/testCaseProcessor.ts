@@ -15,6 +15,8 @@ export default class TestCaseProcessor {
     private readonly traders: SignerWithAddress[];
     private readonly marketMakers: SignerWithAddress[];
 
+    private checkPointBalance: BigNumber = BigNumber.from('0')
+
     constructor(positionManager: FundingRateTest,
                 positionHouse: PositionHouse,
                 positionHouseViewer: PositionHouseViewer,
@@ -77,6 +79,12 @@ export default class TestCaseProcessor {
                 case "assertEntry":
                     await this.processAssertEntry(step, this.traders[data.targetTrader])
                     break
+                case "setBalanceCheckPoint":
+                    await this.setBalanceCheckPoint(step, this.traders[data.targetTrader])
+                    break
+                case "assertCurrentBalanceWithCheckPoint":
+                    await this.assertCurrentBalanceWithCheckPoint(step, this.traders[data.targetTrader])
+                    break
             }
         }
     }
@@ -113,7 +121,8 @@ export default class TestCaseProcessor {
             leverage: leverage,
             quantity: BigNumber.from(quantity),
             _trader: this.traders[trader],
-            _positionManager: this.positionManager
+            _positionManager: this.positionManager,
+            skipCheckBalance: true
         })
         console.log(`OpenLimit: price [${price}], side [${side}], leverage [${leverage}], quantity [${quantity}], trader [${trader}]`)
     }
@@ -183,11 +192,23 @@ export default class TestCaseProcessor {
     async processAssertEntry(step: any, targetTrader: SignerWithAddress) {
         const position = await this.positionHouse.getPosition(this.positionManager.address, targetTrader.address)
         const entry = position.openNotional.div(position.quantity).toNumber().toFixed(3)
-        expect(entry).eq(step.value)
+        console.log(`Entry: ${entry} Step value: ${step.value}`)
+        expect(entry == step.value).true
     }
 
     async processPayFunding(step: any) {
         await this.positionHouse.connect(this.marketMakers[0]).payFunding(this.positionManager.address)
         console.log(`Funding Paid`)
+    }
+
+    async setBalanceCheckPoint(step: any, targetTrader: SignerWithAddress) {
+        this.checkPointBalance = await this.bep20Mintable.balanceOf(targetTrader.address)
+        console.log(`SetBalanceCheckPoint for target trader to ${this.checkPointBalance.toString()}`)
+    }
+
+    async assertCurrentBalanceWithCheckPoint(step: any, targetTrader: SignerWithAddress) {
+        const currentBalance = await this.bep20Mintable.balanceOf(targetTrader.address)
+        console.log(`AssertCurrentBalanceWithCheckPoint current balance of target trader is ${currentBalance.toString()}`)
+        expect(currentBalance.sub(this.checkPointBalance).toNumber()).eq(step.value)
     }
 }

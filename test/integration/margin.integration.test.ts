@@ -2319,7 +2319,32 @@ describe('Test Margin Intergration', function () {
         })
 
         it("EGE-8: Row 1111", async () => {
-            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE8-1111.json')
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-3.json')
+            await testCaseProcessor.process(filePath)
+        })
+
+        it("EGE-772: Row 4", async () => {
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-4.json')
+            await testCaseProcessor.process(filePath)
+        })
+        it("EGE-772: Row 5", async () => {
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-5.json')
+            await testCaseProcessor.process(filePath)
+        })
+        it("EGE-772: Row 6", async () => {
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-6.json')
+            await testCaseProcessor.process(filePath)
+        })
+        it("EGE-772: Row 7", async () => {
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-7.json')
+            await testCaseProcessor.process(filePath)
+        })
+        it("EGE-772: Row 14", async () => {
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-14.json')
+            await testCaseProcessor.process(filePath)
+        })
+        it("EGE-772: Row 25", async () => {
+            const filePath = require('path').resolve(__dirname, '../integration/test-cases/EGE772-25.json')
             await testCaseProcessor.process(filePath)
         })
     });
